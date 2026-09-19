@@ -18,6 +18,7 @@
         owner: root
         group: root
         mode: "0644"
+      notify: Reload nginx
 
     - name: Deploy home page
       ansible.builtin.template:
@@ -32,4 +33,11 @@
         name: nginx
         state: started
         enabled: true
+        use: sysvinit
+
+  handlers:
+    - name: Reload nginx
+      ansible.builtin.service:
+        name: nginx
+        state: reloaded
         use: sysvinit
