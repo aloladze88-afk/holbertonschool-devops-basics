@@ -1,0 +1,35 @@
+---
+- name: Deploy templated Nginx web server
+  hosts: web
+  become: true
+
+  tasks:
+    - name: Install Nginx
+      ansible.builtin.apt:
+        name: nginx
+        state: present
+        update_cache: true
+        cache_valid_time: 3600
+
+    - name: Deploy Nginx site configuration
+      ansible.builtin.template:
+        src: templates/nginx-site.conf.j2
+        dest: /etc/nginx/sites-available/default
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Deploy home page
+      ansible.builtin.template:
+        src: templates/index.html.j2
+        dest: "{{ doc_root }}/index.html"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Start and enable Nginx
+      ansible.builtin.service:
+        name: nginx
+        state: started
+        enabled: true
+        use: sysvinit
